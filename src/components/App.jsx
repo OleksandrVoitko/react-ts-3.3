@@ -1,9 +1,12 @@
 import { Component } from 'react';
+import { IMG_PER_PAGE } from 'serveses/apiConst';
 import { getPhotos } from 'serveses/getPhotos';
 import { DivApp } from './App.styled';
+import { Button } from './Button/Button';
 import { ErrorCard } from './ErrorCard/ErrorCard';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
+import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
 
 export class App extends Component {
@@ -13,6 +16,8 @@ export class App extends Component {
     images: [],
     isLoading: false,
     isError: false,
+    showModal: false,
+    modalImage: '',
   };
 
   componentDidUpdate(prevProps, { searchQuery, page }) {
@@ -26,6 +31,13 @@ export class App extends Component {
       this.setState({ searchQuery, page: 1, images: [] });
     }
   };
+  handlerLoadMore = () => {
+    this.setState(({ page }) => ({ page: page + 1 }));
+  };
+  handleImageClick = image => {
+    this.setState({ modalImage: image });
+    this.toggleModal();
+  };
 
   toggleIsLoading = () => {
     this.setState(({ isLoading }) => ({
@@ -36,6 +48,9 @@ export class App extends Component {
     this.setState(({ isError }) => ({
       isError: !isError,
     }));
+  };
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
   imageSearch = async () => {
@@ -57,13 +72,22 @@ export class App extends Component {
   };
 
   render() {
-    const { searchQuery, page, images, isLoading, isError } = this.state;
+    const { page, images, isLoading, isError, showModal, modalImage } =
+      this.state;
     return (
       <DivApp>
         <Searchbar handleSearch={this.handleSearch} />
-        {isLoading && <Loader />}
         {isError && <ErrorCard>Unable to display photos!</ErrorCard>}
-        {images.length > 0 && <ImageGallery images={images} />}
+        {images.length > 0 && (
+          <ImageGallery images={images} onImageClick={this.handleImageClick} />
+        )}
+        {showModal && (
+          <Modal largeImg={modalImage} onClose={this.toggleModal} />
+        )}
+        {isLoading && <Loader />}
+        {images.length > 0 && images.length / page === IMG_PER_PAGE && (
+          <Button onButtonClick={this.handlerLoadMore} />
+        )}
       </DivApp>
     );
   }

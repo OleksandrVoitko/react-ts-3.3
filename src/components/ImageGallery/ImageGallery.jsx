@@ -1,7 +1,7 @@
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { UlImageGallery } from './ImageGallery.styled';
 
-export function ImageGallery({ images }) {
+export function ImageGallery({ images, onImageClick }) {
   return (
     <UlImageGallery>
       {images.map(({ id, webformatURL, largeImageURL }) => (
@@ -9,6 +9,7 @@ export function ImageGallery({ images }) {
           key={id}
           src={webformatURL}
           modalImage={largeImageURL}
+          onImageClick={onImageClick}
         />
       ))}
     </UlImageGallery>
